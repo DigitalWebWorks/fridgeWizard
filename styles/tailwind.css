@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;700&family=Mynerve&family=Oswald&display=swap');
+
+/* 
+body {
+    @apply bg-white bg-opacity-95 h-full overflow-x-hidden;
+    font-family: 'Inter', sans-serif;
+}
+
+#__next {
+    @apply h-full;
+} */
+
+/* html {
+    @apply h-full;
+}
+*/
+
+.App {
+  text-align: center;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  font-family: Virgil;
+}
+
+/* @font-face {
+  font-family: "Virgil";
+  src: url("https://virgil.excalidraw.com/Virgil.woff2");
+  font-display: swap;
+} */
+
+/* *:focus {
+  outline: none;
+} */
+
+.auth-form-container,
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+}
+@media screen and (min-width: 600px) {
+}
+.auth-form-container {
+  padding: 5rem;
+  /* border: 2px solid dodgerblue; */
+  background-color: white;
+  border-radius: 10px;
+  margin: 0.5rem;
+}
+
+label {
+  text-align: left;
+  padding: 0.25rem 0;
+}
+input {
+  margin: 0.5rem 0;
+  /* border: 1.5px solid dodgerblue; */
+  background-color: white;
+  border-radius: 5px;
+}
+
+button {
+  border: none;
+  background-color: dodgerblue;
+  color: white;
+  padding: 20 px;
+  border-radius: 5px;
+}
+
+.link-btn {
+  background: none;
+  color: dodgerblue;
+  text-decoration: underline;
+}
