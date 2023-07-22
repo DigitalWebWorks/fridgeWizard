@@ -39,62 +39,76 @@ function App() {
 
   // checks whether user has an active session or not on component loading
   useEffect(() => {
-    const cookies = new Cookies();
-    const githubToken = cookies.get('githubToken');
-
-    console.log('githubToken: ', githubToken)
     const fetchUserEmail = async () => {
       try {
-        const res = await axios.post('http://localhost:3000/api/oauth/userdata', { githubToken });
-        // const res = await axios.get('http://localhost:3000/api/oauth/userdata');
-        console.log('loginWithGithub res: ', res.data)
-        if (res.data.userEmail) {
-          localStorage.setItem('email', res.data.userEmail);
-          setIsLoggedIn(true);
-          setView('homepage')
-        }
+        const cookies = new Cookies();
+        const githubToken = cookies.get('githubToken');
+        // const token = cookies.get('token');
+        // console.log('token: ', token)
+
+        // if (!githubToken) {
+        //   console.log('no githubtoken')
+        //   setIsLoggedIn(false);
+        //   return;
+        // }
+        // const res = await axios.post('http://localhost:3000/api/oauth/userdata', { githubToken });
+        const res = await axios.get('http://localhost:3000/api/oauth/userdata', {
+          //   headers: {
+          //     'Authorization': `Bearer ${githubToken}`,
+            // },
+          });
+          console.log('loginWithGithub res: ', res.data)
+        // console.log('cookies: ', )
+        if(res.data.userEmail) {
+            localStorage.setItem('email', res.data.userEmail);
+        setIsLoggedIn(true);
+        setView('homepage')
+      }
       }
       catch (err) {
-        console.log('error fetching userdata', err)
-      }
+      console.log('error fetching userdata', err)
     }
-
-    const checkUserSession = async () => {
-      try {
-        const res = await checkSession();
-        if (res) {
-          setIsLoggedIn(true);
-          setIsLoading(false);
-        }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    // handleCodeParams();
-    fetchUserEmail();
-    checkUserSession();
-  });
-
-
-
-  if (isLoading) {
-    return <div>Loading...</div>;
   }
 
-  return (
-    <div className="bg-gradient-to-b from-zinc-100 via-zinc-300 to-sky-300 min-h-screen">
-      <div className="pb-32">
-        {isLoggedIn
-          ?
-          <Dashboard isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-          :
-          <Homepage setIsLoggedIn={setIsLoggedIn} view={view} setView={setView} />
-        }
-      </div>
+    const checkUserSession = async () => {
+    try {
+      const res = await checkSession();
+      if (res) {
+        setIsLoggedIn(true);
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  checkUserSession();
+  if (!isLoggedIn && localStorage.getItem('email') === null) {
+    fetchUserEmail();
+  }
+});
+
+
+
+if (isLoading) {
+  return <div>Loading...</div>;
+}
+
+return (
+  <div className="bg-gradient-to-b from-zinc-100 via-zinc-300 to-sky-300 min-h-screen">
+    <div className="pb-32">
+      {isLoggedIn
+        ?
+        <Dashboard isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+        :
+        <Homepage setIsLoggedIn={setIsLoggedIn} view={view} setView={setView} />
+      }
     </div>
-  );
+  </div>
+);
 }
 
 export default App;

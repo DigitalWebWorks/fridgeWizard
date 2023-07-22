@@ -13,14 +13,14 @@ require('./db')
 // routers are defined here
 const apiRouter = require('./routes/apiRouter');
 const userRouter = require('./routes/userRoutes');
-const inventoryRouter = require('./routes/inventoryRoutes'); 
+const inventoryRouter = require('./routes/inventoryRoutes');
 
 const app = express();
 
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(__dirname, "../build")));
 
 app.get("/", (req, res) => {

@@ -10,21 +10,6 @@ const GitHubButton = ({ setIsLoggedIn, setView, setEmail }) => {
     window.location.assign("https://github.com/login/oauth/authorize?client_id=" + process.env.GITHUB_CLIENT_ID)
   }
 
-  // useEffect(() => {
-  //   async () => {
-  //     try {
-  //       const res = await axios.get('http://localhost:3000/api/oauth/user');
-  //       console.log('loginWithGithub res: ', res.data)
-  //       setIsLoggedIn(true);
-  //       setView('homepage')
-  //     }
-  //     catch (err) {
-  //       console.log('error fetching userdata', err)
-  //     }
-  //   }
-  // }, []);
-
-
   return (
     <a
       href={'http://localhost:3000/api/oauth'}
