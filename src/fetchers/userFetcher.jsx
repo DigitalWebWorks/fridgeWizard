@@ -37,3 +37,14 @@ export const logoutUser = async () => {
     return err;
   }
 }
+
+// export const oauth = async () => {
+//   console.log("----> oauth fetcher is running");
+//   try {
+//     const res = await axios.get('/api/oauth/user');
+//     console.log('-----> oauth userFetcher - res.data : ', res.data)
+//     return res.data;
+//   } catch (err) {
+//     console.log("oauth fetcher is not working");
+//   }
+// }
