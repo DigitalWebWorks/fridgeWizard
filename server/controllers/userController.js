@@ -1,16 +1,21 @@
 // const jwt = require("jsonwebtoken");
 // const bcrypt = require("bcryptjs");
 // const asyncHandler = require("express-async-handler");
+
 // require in user model
-const UserData = require('../models/userModel')
+// // for mongoDB:
+// const UserData = require('../models/userModel')
+// for SQL:
+const db = require('../models/userModelSQL')
 
 // @description Register new user
 // @route POST /api/users/register
 // @access Public
 const userController = {};
-
 userController.createUser =  async (req, res, next) => {
+  console.log('entered createUser');
   try {
+    // deconstruct request body
     const { name, email, password } = req.body;
   
     // check for all user inputs
@@ -20,16 +25,30 @@ userController.createUser =  async (req, res, next) => {
     }
   
     // check if user exists
-    const userExists = await UserData.findOne({ email });
-    console.log(userExists);
-  
-    if (userExists) {
-      return next('User already exists')
-    }
-  
-    const newUser = await UserData.create({ username: name, password, email })
+    // for mongoDB:
+    // const userExists = await UserData.findOne({ email });
 
+    // const selectHomeworlds = 'SELECT people.*, planets.name AS homeworld FROM "public"."people" INNER JOIN "public"."planets" ON planets._id = people.homeworld_id';
+    // const selectFilms = 'SELECT people._id, films.title FROM "public"."people" INNER JOIN "public"."people_in_films" ON people_in_films.person_id = people._id INNER JOIN "public"."films" ON films._id = people_in_films.film_id WHERE people._id = $1';
+
+    // for SQL:
+    // const existsQuery = `SELECT email FROM users WHERE email = ${email}`
+
+    // const userExists = await db.query(existsQuery);
+
+    // console.log('userExists', userExists);
   
+    // if (userExists) {
+    //   return next('User already exists')
+    // }
+
+    const values = [name, email, password];
+    const createUserQuery = `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`;
+    const newUser = db.query(createUserQuery, values);
+  
+    // // for MongoDB:
+    // const newUser = await UserData.create({ username, password, email })
+
     res.locals.newUser = newUser;
   
     return next();
@@ -39,6 +58,7 @@ userController.createUser =  async (req, res, next) => {
   }
  
 };
+
 
 // @description Authenticate user data
 // @route POST /api/users/login

@@ -6,9 +6,10 @@ const { errorHandler } = require("./middleware/errorMiddleware");
 
 const PORT = 3000;
 
-// starts the Mongo DB when the server is started
-require('dotenv').config();
-require('./db')
+// // for mongoDB connection:
+// // starts the Mongo DB when the server is started
+// require('dotenv').config();
+// require('./db')
 
 // routers are defined here
 const apiRouter = require('./routes/apiRouter');
