@@ -45,19 +45,19 @@ function CompositionGraph({ fridgeContents }) {
   };
 
   fridgeContents.forEach((el) => {
-    shelfLife.forEach(element =>{
-        if (el.type === element.item) data.datasets[0].data[catagoryDataIndicies[element.category]]++;
-    })  
+    shelfLife.forEach(element => {
+      if (el.type === element.item) data.datasets[0].data[catagoryDataIndicies[element.category]]++;
+    })
   });
 
   return (
-   
-      <div className="flex flex-col items-center justify-center max-h-[650px] bg-white">
-       
-          <Radar data={data} />
-        
-      </div>
-   
+
+    <div className="flex flex-col justify-center max-h-[650px] bg-white m-50">
+
+      <Radar data={data} />
+
+    </div>
+
   )
 }
 

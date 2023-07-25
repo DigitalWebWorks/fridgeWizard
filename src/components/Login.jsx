@@ -110,7 +110,7 @@ const Login = ({ setView, setIsLoggedIn }) => {
               <div className="mx-4 font-mynerve text-gray-500">OR</div>
               <div className="flex-grow border-b border-gray-400"></div>
             </div>
-            <GitHubButton />
+            <GitHubButton setIsLoggedIn={setIsLoggedIn} setView={setView} setEmail={setEmail}/>
           </div>
         </motion.div>
       </div>

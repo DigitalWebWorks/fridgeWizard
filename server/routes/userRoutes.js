@@ -12,6 +12,7 @@ router.post("/register", userController.createUser, sessionController.startSessi
 });
 
 router.post("/login", userController.verifyUser, sessionController.startSession, (req, res) => {
+  console.log('/LOGIN ')
   res.status(200).json({ status: res.locals.status, user: res.locals.user });
 });
 
