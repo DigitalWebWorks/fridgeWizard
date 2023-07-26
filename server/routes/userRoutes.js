@@ -16,9 +16,9 @@ router.post("/login", userController.verifyUser, sessionController.startSession,
   res.status(200).json({ status: res.locals.status, user: res.locals.user });
 });
 
-router.get("/home", userController.goHome, (req, res) => {
-  // add logic here
-}); // add authorization middleware before getHome route
+// router.get("/home", userController.goHome, (req, res) => {
+//   // add logic here
+// }); // add authorization middleware before getHome route
 
 
 module.exports = router;

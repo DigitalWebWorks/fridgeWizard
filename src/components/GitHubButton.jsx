@@ -1,42 +1,14 @@
 import React from "react";
 import { FaGithub } from 'react-icons/fa';
-import { useEffect, useState } from 'react';
-import { oauth } from "../fetchers/userFetcher";
-import axios from 'axios'
+import { Link } from 'react-router-dom';
 
-const GitHubButton = ({ setIsLoggedIn, setView, setEmail }) => {
-
-  const loginWithGithub = async () => {
-    window.location.assign("https://github.com/login/oauth/authorize?client_id=" + process.env.GITHUB_CLIENT_ID)
-  }
+const GitHubButton = () => {
 
   return (
-    <a
-      href={'http://localhost:3000/api/oauth'}
-      className="
-        hover:transform 
-        hover:transition-all 
-        hover:scale-110 
-        cursor-pointer 
-        flex 
-        items-center 
-        justify-center 
-        gap-2 
-        border 
-        border-1 
-        border-slate-400 
-        rounded-3xl 
-        font-mynerve
-        text-xl
-        mt-4 
-        p-3 
-        shadow-xl
-      "
-      // onClick={loginWithGithub}
-    >
+    <Link to='http://localhost:3000/api/oauth' className=" hover:transform hover:transition-all hover:scale-110 cursor-pointer flex items-center justify-center gap-2 border border-1 border-slate-400 rounded-3xl font-mynerve text-xl mt-4 p-3 shadow-xl " >
       <FaGithub size={30} />
       <span>Sign in with GitHub</span>
-    </a>
+    </Link>
   );
 };
 

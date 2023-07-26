@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Contents } from './Contents';
 import { getFood } from '../fetchers/itemFetcher';
-import Header from './Header';
+// import Header from './Header';
 import InputFields from './InputFields';
 import LoadingSpinner from './LoadingSpinner'
 import CompositionGraph from './CompositionGraph'
 import IconButtons from './IconButtons';
 import ExpiringSoon from './ExpiringSoon'
 import Expired from './Expired'
+import HeaderForDashboard from './HeaderForDashboard';
+
 
 //import types object from json object in db
 
@@ -28,11 +30,10 @@ export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
     getFoodContent();
   }, [])
 
+ 
   return (
     <div className='flex flex-col'>
-      <div className='pb-20'>
-        <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-      </div>
+      <HeaderForDashboard />
       <div className='flex items-center justify-center'>
         <div className="w-3/5 md:w-1/2 flex flex-col">
           <div className='flex items-center justify-between'>
@@ -55,15 +56,12 @@ export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
           </div>
           <div className='flex flex-col'>
             <InputFields email={email} setFridgeContents={setFridgeContents} />
-            {/* { graphClicked ? <CompositionGraph fridgeContents={fridgeContents}/>
-                   : isLoading ? <LoadingSpinner /> : <Contents email={email} isLoading={isLoading} setFridgeContents={setFridgeContents} fridgeContents={fridgeContents}/>
-                  } */}
-              {graphClicked &&
+            {graphClicked &&
               <>
                 <CompositionGraph fridgeContents={fridgeContents} />
               </>
-              }
-              {isLoading && <LoadingSpinner />}
+            }
+            {isLoading && <LoadingSpinner />}
             <Contents email={email} isLoading={isLoading} setFridgeContents={setFridgeContents} fridgeContents={fridgeContents} />
           </div>
         </div>

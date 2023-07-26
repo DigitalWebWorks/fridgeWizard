@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-
+import { Routes, Route } from "react-router-dom";
+import { AuthContext } from "./authContext";
 import Homepage from "./Homepage";
 import { Dashboard } from "./Dashboard";
+import Login from './Login'
+import Register from "./Register";
 import { checkSession } from "../fetchers/userFetcher";
 
 import axios from 'axios';
@@ -46,23 +49,28 @@ function App() {
     checkUserSession();
   });
 
-
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="bg-gradient-to-b from-zinc-100 via-zinc-300 to-sky-300 min-h-screen">
-      <div className="pb-32">
-        {isLoggedIn
-          ?
-          <Dashboard isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-          :
-          <Homepage setIsLoggedIn={setIsLoggedIn} view={view} setView={setView} />
-        }
-      </div>
-    </div>
+    <>
+      <AuthContext.Provider value={{ setIsLoggedIn, isLoggedIn, view, setView }}>
+        <Routes>
+          <Route path='/' element={<Homepage />} />
+          {isLoggedIn ? (
+            <>
+              <Route path='/dashboard' element={<Dashboard />} />
+            </>
+          ) : (
+            <>
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
+            </>
+          )}
+        </Routes>
+      </AuthContext.Provider>
+    </>
   );
 }
 

@@ -24,7 +24,7 @@ router.get('/oauth', sessionController.githubAuth, (req, res) => {
 
 router.get('/oauth/user', sessionController.getGithubToken, (req, res) => {
   console.log('/OAUTH/USER ')
-  res.status(200).redirect('http://localhost:8080/');
+  res.status(200).redirect('http://localhost:8080/dashboard');
 
 })
 
