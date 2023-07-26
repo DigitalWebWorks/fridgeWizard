@@ -44,10 +44,16 @@ function CompositionGraph({ fridgeContents }) {
     "drinks": 4,
   };
 
+  // fridgeContents.forEach((el) => {
+  //   shelfLife.forEach(element => {
+  //     if (el.type === element.item) data.datasets[0].data[catagoryDataIndicies[element.category]]++;
+  //   })
+  // });
+
   fridgeContents.forEach((el) => {
-    shelfLife.forEach(element => {
-      if (el.type === element.item) data.datasets[0].data[catagoryDataIndicies[element.category]]++;
-    })
+    
+      data.datasets[0].data[catagoryDataIndicies[el.category]]++;
+    
   });
 
   return (

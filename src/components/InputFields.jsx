@@ -27,7 +27,7 @@ function InputFields({ setFridgeContents, email }) {
                 return; 
             }
             // console.log(category);
-            const res = await postFood({ type, name: itemName, expDate2, email, category });
+            const res = await postFood({ type, name: itemName, purchaseDate, email  });
             setError('');
             setFridgeContents(res);
             setPurchaseDate(moment().format('YYYY-MM-DD'))

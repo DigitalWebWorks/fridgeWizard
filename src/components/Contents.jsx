@@ -16,7 +16,7 @@ const columns = [
     },
     {
         name: 'Expiration Date',
-        selector: row => row.expDate,
+        selector: row => row.exp_date,
         sortable: true,
     },
 ];
@@ -55,7 +55,7 @@ export const Contents = ({ fridgeContents, setFridgeContents, isLoading, email }
 
 	const contextActions = useMemo(() => {
 		const handleDelete = () => {
-			
+			console.log('selectedRows', selectedRows);
 			if (window.confirm(`Are you sure you want to delete:\r ${selectedRows.map(r => r.name)}?`)) {
 				setToggleCleared(!toggleCleared);
 				setFridgeContents(differenceBy(fridgeContents, selectedRows));

@@ -8,8 +8,8 @@ const PORT = 3000;
 
 // // for mongoDB connection:
 // // starts the Mongo DB when the server is started
-// require('dotenv').config();
-// require('./db')
+require('dotenv').config();
+require('./db')
 
 // routers are defined here
 const apiRouter = require('./routes/apiRouter');
