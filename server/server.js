@@ -5,7 +5,7 @@ const path = require("path");
 
 const PORT = 3000;
 
-// require in dotenv so we have access to .env file contents
+// require and load in dotenv so we have access to .env file contents
 require('dotenv').config();
 
 // routers are defined here

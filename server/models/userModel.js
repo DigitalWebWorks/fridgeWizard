@@ -1,9 +1,10 @@
+// require and load in dotenv so we have access to .env file contents
+require('dotenv').config();
+
 const { Pool } = require('pg');
 
-const SQL_URI = 'postgres://pvmwexss:ZXwHc0j_bTVGao_gZwqV65rPwI-ORix-@isilo.db.elephantsql.com/pvmwexss';
-
 const pool = new Pool({
-    connectionString: SQL_URI
+    connectionString: process.env.SQL_URI
 });
 
 module.exports = {
