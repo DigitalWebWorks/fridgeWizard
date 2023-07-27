@@ -14,12 +14,6 @@ router.post("/", inventoryController.setItem, (req, res) => {
 });
 
 // are id params needed?
-// update item
-router.put("/:id", inventoryController.updateItem, (req, res) => {
-  res.status(200).json(res.locals.updateItem);
-});
-
-// are id params needed?
 //delete item
 router.delete("/", inventoryController.deleteItem, (req, res) => {
   res.status(200).json({ message: "Item deleted" });

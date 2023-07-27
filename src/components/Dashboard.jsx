@@ -46,7 +46,6 @@ export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
               setESClicked={setESClicked}
               graphClicked={graphClicked}
               setgraphClicked={setgraphClicked}
-              fridgeContents={fridgeContents}
             />
           </div>
           <div className='flex flex-col w-3/5 gap-4'>

@@ -21,30 +21,8 @@ const columns = [
     },
 ];
 
-// const tableDataItems = [
-//     {
-//         id: 1,
-//         name: 'leftovers',
-//         type: 'cooked food',
-//         expDate: "07-10-2023"
-//     },
-//     {
-//         id: 2,
-//         name: 'apple',
-//         type: 'fruit',
-//         expDate: "07-23-2023"
-//     },
-//     {
-//         id: 3,
-//         name: 'pizza',
-//         type:'cooked food',
-//         expDate: "07-14-2023"
-//     },
-// ]
-
-
-export const Contents = ({ fridgeContents, setFridgeContents, isLoading, email }) => {
-    const [selectedRows, setSelectedRows] = useState([]);
+export const Contents = ({  fridgeContents, setFridgeContents, isLoading, email }) => {
+  const [selectedRows, setSelectedRows] = useState([]);
 	const [itemsToDelete, setItemsToDelete] = useState(false);
 	const [toggleCleared, setToggleCleared] = useState(false);
 	
@@ -54,11 +32,11 @@ export const Contents = ({ fridgeContents, setFridgeContents, isLoading, email }
 
 
 	const contextActions = useMemo(() => {
-		const handleDelete = () => {
-			console.log('selectedRows', selectedRows);
+		const handleDelete = async () => {
 			if (window.confirm(`Are you sure you want to delete:\r ${selectedRows.map(r => r.name)}?`)) {
 				setToggleCleared(!toggleCleared);
-				setFridgeContents(differenceBy(fridgeContents, selectedRows));
+				// setFridgeContents(differenceBy(fridgeContents, selectedRows));
+				await deleteFood(selectedRows, email);
 				setItemsToDelete(true);
 			}
 		};
@@ -109,4 +87,3 @@ export const Contents = ({ fridgeContents, setFridgeContents, isLoading, email }
 		/>
   )
 }
-

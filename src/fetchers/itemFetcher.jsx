@@ -18,9 +18,9 @@ export const getFood = async (email) => {
   }
 }
 
-export const deleteFood = async (fridgeContents, email) => {
+export const deleteFood = async (selectedRows, email) => {
   try {
-    await axios.delete('api/inventory', { data: { fridgeContents, email } })
+    await axios.delete('api/inventory', { data: { selectedRows, email } })
   } catch (err) {
     console.log(err);
   }

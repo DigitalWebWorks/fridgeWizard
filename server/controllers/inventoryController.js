@@ -56,6 +56,7 @@ inventoryController.setItem = async (req, res, next) => {
     const expDate = new Date(purchaseDate);
     const days = expDate.getDate() + shelfLifeData.rows[0].exp_days;
     expDate.setDate(days);
+    expDate.toDateString();
     
     // execute getIdQuery, assign response to constant user
     const user = await db.query(getIdQuery, [email]);
@@ -84,80 +85,23 @@ inventoryController.setItem = async (req, res, next) => {
   }
 };
 
-// @description Update items
-// @route PUT /api/items/:id
-// @access Private
-inventoryController.updateItem = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { email, item, type, category, expDate } = req.body;
-
-    // find user in database
-    const user = await UserData.findOne({ email });
-
-    // if no user in database
-    if (!user) {
-      return res.status(400).json({ message: "No user found" });
-    }
-
-    // if each fridgeContents object has a unique id
-    const itemIndex = user.fridgeContents.findIndex((food) => {
-      return food._id === id;
-    });
-
-    // if item not found in fridge
-    if (itemIndex === -1) {
-      return res.status(404).json({ message: "Fridge content not found" });
-    }
-
-    // if item is found update it
-    user.fridgeContents[itemIndex] = {
-      item,
-      type,
-      category,
-      expDate,
-    };
-
-    // save updated document
-    await user.save();
-
-    // idea from Robert:
-    // get user then copy contetns into obj
-    // try findOneandUpdate
-    // then change it and re save to database
-    // lookup way to go inside a propery in model
-
-    res.locals.updatedItem = user.fridgeContents;
-    return next();
-  } catch (error) {
-    console.error(error);
-    return next(error);
-  }
-};
-
 // @description Delete item
 // @route DELETE /api/items/:id
 // @access Private
 inventoryController.deleteItem = async (req, res, next) => {
   // deconstruct request body
-  const { email, fridgeContents } = req.body;
-  // console.log('fridgeContents', fridgeContents);
+  const { email, selectedRows } = req.body;
 
   try {
+    // define query deleteQuery to delete item from fridge_contents
+    const deleteQuery = `DELETE FROM fridge_contents WHERE id = $1`
+    // loop through selectedRows array 
+    for (let i = 0; i < selectedRows.length; i++){
+      // execute selectedRows with value of current selectedRows elemnents id
+      await db.query(deleteQuery, [selectedRows[i].id]);
+    }
 
-    const newFridgeContents = fridgeContents;
-
-    // find user in database
-    const user = await UserData.findOneAndUpdate({ email }, 
-    {
-     fridgeContents: newFridgeContents
-    }, 
-    {
-      upsert: true,
-      new: true
-    });
-
-    // return invocation of next
+    // after loop completes, return invocation of next
     return next();
 
   // catch - if error experienced during database queries
