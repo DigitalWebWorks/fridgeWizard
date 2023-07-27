@@ -1,14 +1,39 @@
 // require in userModelSQL
-const db = require('../models/userModelSQL');
+const db = require('../models/userModel');
 
 // define inventoryController object
 const inventoryController = {};
 
 // define query getIdQuery to grab user id; search using email
 const getIdQuery = `SELECT id FROM users WHERE email = ($1)`;
+// define query getFridgeQuery to grab wholistic fridge_contents data for a user
+const getFridgeQuery = `SELECT * FROM fridge_contents WHERE user_id = ($1)`;
 
-// @description Get items
-// @route GET /api/items
+// @description Get types data for dropdown menu
+// @route GET /api/inventory/types
+// @access Public
+inventoryController.getTypes = async (req, res, next) => {
+  try {
+    // define getTypesQuery to grab wholistic shelf_life data
+    const getTypesQuery = 'SELECT * FROM shelf_life';
+    // execute getTypesQuery, assign response to constant shelfLifeData
+    const shelfLifeData = await db.query(getTypesQuery);
+    // assign res.locals.shelfLifeData to shelfLifeData
+    res.locals.shelfLifeData = shelfLifeData;
+    // return invocation of next
+    return next();
+
+  // catch - if error experienced during database queries
+  } catch (error) {
+    // log error
+    console.log(error);
+    // return invocation of next, passing in error
+    return next(error);
+  }
+}
+
+// @description Get fridge items for a user
+// @route GET /api/inventory/:email
 // @access Public
 inventoryController.getItem = async (req, res, next) => {
   // deconstruct request parameters
@@ -19,27 +44,25 @@ inventoryController.getItem = async (req, res, next) => {
     const user = await db.query(getIdQuery, [email]);
     // declare a constant id, assign it the row id value from user
     const id = user.rows[0].id;
-    // define query getFridgeQuery to grab all fridge_contents data associated with this user
-    const getFridgeQuery = `SELECT * FROM fridge_contents WHERE user_id = ($1)`;
-    // execute getFridgeQuery, assign response to to constant fridgeContents
+    // execute getFridgeQuery, assign response to constant fridgeContents
     const fridgeContents = await db.query(getFridgeQuery, [id]);
-    // assign fridgeContents to res.locals.getItem
-    res.locals.getItem = fridgeContents;
+    // assign res.locals.fridgeContents to fridgeContents
+    res.locals.fridgeContents = fridgeContents;
     // return invocation of next
     return next();
 
   // catch - if error experienced during database queries
   } catch (error) {
     // log error
-    console.error(error);
-    // return invocation of next, passing in err
+    console.log(error);
+    // return invocation of next, passing in error
     return next(error);
   }
 };
 
-// @description Set items
-// @route POST /api/items
-// @access Private
+// @description Add new fridge item for a user
+// @route POST /api/inventory
+// @access Public
 inventoryController.setItem = async (req, res, next) => {
   // deconstruct request body
   const { email, name, type, purchaseDate } = req.body;
@@ -52,7 +75,7 @@ inventoryController.setItem = async (req, res, next) => {
     // declare constant category, assign to category value from shelfLifeData
     const category = shelfLifeData.rows[0].category;
 
-    // date stuff
+    // convert expDate to desired date format
     const expDate = new Date(purchaseDate);
     const days = expDate.getDate() + shelfLifeData.rows[0].exp_days;
     expDate.setDate(days);
@@ -66,28 +89,27 @@ inventoryController.setItem = async (req, res, next) => {
     const values = [id, name, type, category, expDate];
     /// define query setItemQuery to insert new row into fridge_contents; return new data
     const setItemQuery = 'INSERT INTO fridge_contents (user_id, name, type, category, exp_date) VALUES ($1, $2, $3, $4, $5)';
-    // execute setItemQuery, assign response to constant newItem
-    const newItem = await db.query(setItemQuery, values);
-
-    /* newItem is SQL response with nothing in it, as we are not returning anything from setItemQuery */
-
-    // assign newItem to res.locals.newItem
-    res.locals.newItem = newItem;
+    // execute setItemQuery to add item into database
+    await db.query(setItemQuery, values);
+    // execute getFridgeQuery, assign response to constant fridgeContents
+    const fridgeContents = await db.query(getFridgeQuery, [id]);
+    // assign res.locals.fridgeContents to fridgeContents
+    res.locals.fridgeContents = fridgeContents;
     // return invocation of next
     return next();
 
   // catch - if error experienced during database queries
   } catch (error) {
     // log error
-    console.error(error);
+    console.log(error);
     // return invocation of next, passing in err
     return next(error);
   }
 };
 
-// @description Delete item
-// @route DELETE /api/items/:id
-// @access Private
+// @description Delete fridge items for a user
+// @route DELETE /api/inventory
+// @access Public
 inventoryController.deleteItem = async (req, res, next) => {
   // deconstruct request body
   const { email, selectedRows } = req.body;
@@ -97,17 +119,25 @@ inventoryController.deleteItem = async (req, res, next) => {
     const deleteQuery = `DELETE FROM fridge_contents WHERE id = $1`
     // loop through selectedRows array 
     for (let i = 0; i < selectedRows.length; i++){
-      // execute selectedRows with value of current selectedRows elemnents id
+      // execute selectedRows with value of current selectedRows elements id
       await db.query(deleteQuery, [selectedRows[i].id]);
     }
 
-    // after loop completes, return invocation of next
+    // execute getIdQuery, assign response to constant user
+    const user = await db.query(getIdQuery, [email]);
+    // declare a constant id, assign it the row id value from user
+    const id = user.rows[0].id;
+    // execute getFridgeQuery, assign response to constant fridgeContents
+    const fridgeContents = await db.query(getFridgeQuery, [id]);
+    // assign res.locals.fridgeContents to fridgeContents
+    res.locals.fridgeContents = fridgeContents;
+    // return invocation of next
     return next();
 
   // catch - if error experienced during database queries
   } catch (error) {
     // log error
-    console.error(error);
+    console.log(error);
     // return invocation of next, passing in err
     return next(error);
   }

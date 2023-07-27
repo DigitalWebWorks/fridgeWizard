@@ -10,7 +10,7 @@ export default function ExpiringSoon( {fridgeContents} ) {
       <ul className="font-mynerve bg-white border border-black rounded-md p-2 shadow-md text-orange-700">
         {fridgeContents.map((element, index) => {
           if (moment(element.exp_date).isBetween(moment(), moment().add(5, "d"))) {
-            return <li key={index}>Item: {element.name} ... Expiration Date: {element.exp_date}</li>
+            return <li key={index}>Item: {element.name} ... Expiration Date: {moment(element.exp_date).format("dddd, MMMM Do YYYY")}</li>
           }
         })}
       </ul>

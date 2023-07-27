@@ -1,12 +1,12 @@
-// require in userModelSQL
-const db = require('../models/userModelSQL')
+// require in userModel
+const db = require('../models/userModel')
 // require in bcrypt
 const bcrypt = require('bcryptjs');
 
 // define userController object
 const userController = {};
 
-// @description Register new user
+// @description Register a new user
 // @route POST /api/users/register
 // @access Public
 userController.createUser = async (req, res, next) => {

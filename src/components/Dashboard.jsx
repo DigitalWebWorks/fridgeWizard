@@ -9,8 +9,6 @@ import IconButtons from './IconButtons';
 import ExpiringSoon from './ExpiringSoon'
 import Expired from './Expired'
 
-//import types object from json object in db
-
 export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
   const [fridgeContents, setFridgeContents] = useState([]);
   const [isLoading, setIsLoading] = useState(true)

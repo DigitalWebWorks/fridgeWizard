@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
-import differenceBy from 'lodash/differenceBy'
 import DataTable from 'react-data-table-component';
 import { deleteFood } from '../fetchers/itemFetcher';
+import moment from "moment";
 
 const columns = [
     {
@@ -15,15 +15,15 @@ const columns = [
         sortable: true,
     },
     {
-        name: 'Expiration Date',
+		name: 'Expiration Date',
         selector: row => row.exp_date,
         sortable: true,
+        format: row => moment(row.exp_date).format("dddd, MMMM Do YYYY"),
     },
 ];
 
-export const Contents = ({  fridgeContents, setFridgeContents, isLoading, email }) => {
-  const [selectedRows, setSelectedRows] = useState([]);
-	const [itemsToDelete, setItemsToDelete] = useState(false);
+export const Contents = ({  fridgeContents, setFridgeContents, email }) => {
+  	const [selectedRows, setSelectedRows] = useState([]);
 	const [toggleCleared, setToggleCleared] = useState(false);
 	
 	const handleRowSelected = useCallback(state => {
@@ -35,9 +35,8 @@ export const Contents = ({  fridgeContents, setFridgeContents, isLoading, email 
 		const handleDelete = async () => {
 			if (window.confirm(`Are you sure you want to delete:\r ${selectedRows.map(r => r.name)}?`)) {
 				setToggleCleared(!toggleCleared);
-				// setFridgeContents(differenceBy(fridgeContents, selectedRows));
-				await deleteFood(selectedRows, email);
-				setItemsToDelete(true);
+				const res = await deleteFood(selectedRows, email);
+        setFridgeContents(res);
 			}
 		};
 
@@ -61,18 +60,6 @@ export const Contents = ({  fridgeContents, setFridgeContents, isLoading, email 
 			</button>
 		);
 	}, [fridgeContents, selectedRows, toggleCleared]);
-
-	useEffect(() => {
-		const tryDeleteFood = async () => {
-			await deleteFood(fridgeContents, email)
-		}
-		
-		if (!isLoading && itemsToDelete) {
-			tryDeleteFood();
-			setItemsToDelete(false);
-		}
-		
-	}, [fridgeContents])
 
 	return (
 		<DataTable

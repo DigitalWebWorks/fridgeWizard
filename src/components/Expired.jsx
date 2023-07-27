@@ -8,7 +8,7 @@ export default function Expired( {fridgeContents} ) {
     <ul className='bg-white border border-black font-mynerve rounded-md shadow-md p-2 text-red-500'>
       {fridgeContents.map((element, index) => {
         if (moment(element.exp_date).isBefore(moment())) {
-          return <li key={index}>Item: {element.name} --- Expiration Date: {element.exp_date}</li>
+          return <li key={index}>Item: {element.name} --- Expiration Date: {moment(element.exp_date).format("dddd, MMMM Do YYYY")}</li>
         }
       })}
     </ul>
