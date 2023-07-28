@@ -8,9 +8,8 @@ const sessionController = require("../controllers/sessionController");
 // import authorization middleware
 const { protect } = require("../middleware/authMiddleware");
 
-// register
-router.post("/register", userController.createUser, sessionController.startSession, (req, res) => {
-  res.status(200).json(res.locals.newUser);      
+router.post("/register", userController.createUser, sessionController.startSession, (req, res) => {  
+  res.status(200).json({ status: res.locals.status, user: res.locals.newUser });
 });
 
 // login

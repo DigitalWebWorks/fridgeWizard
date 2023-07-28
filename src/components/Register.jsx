@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { motion } from "framer-motion";
 import { registerUser } from '../fetchers/userFetcher';
-
 import { FaGithub } from 'react-icons/fa';
 import Header from "./Header";
+import { Link } from 'react-router-dom';
+import { AuthContext } from "./authContext";
+import { useNavigate } from "react-router-dom";
+import GitHubButton from "./GitHubButton";
 
-const Register = ({ setView, setIsLoggedIn }) => {
+const Register = () => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const auth = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -20,14 +25,17 @@ const Register = ({ setView, setIsLoggedIn }) => {
     }
 
     const res = await registerUser(email, pass, name);
-    const newUser = res;
-
-    if (newUser) {
-      setIsLoggedIn(true);
-    }  
+  
+    if (res.status === true) {
+      localStorage.setItem('email', email);
+      auth.setIsLoggedIn(res.status);
+      navigate("/dashboard");
+    } else {
+      setError(res.status);
+    }
   };
 
-  return(
+  return (
     <div className="h-full w-full flex flex-col">
       <Header />
       <div className="flex flex-col items-center justify-center">
@@ -35,80 +43,38 @@ const Register = ({ setView, setIsLoggedIn }) => {
           <h2 className="text-slate-800 text-3xl font-mynerve font-bold mb-4">Register</h2>
           <form className="flex flex-col" onSubmit={handleRegister}>
             {/* <label htmlFor="name">Full name</label> */}
-            <input 
-              className="
-                focus:transform 
-                focus:transition-all 
-                focus:scale-110  
-                focus:outline-slate-700 
-                text-sm 
-                font-mynerve
-                shadow-xl 
-                rounded-md 
-                bg-inherit
-                outline 
-                outline-1
-                outline-slate-400
-                p-3 
-              " 
-              value={name} 
-              onChange={(e) => setName(e.target.value)} 
-              name="name" 
-              id="name" 
-              placeholder="Username" 
-              autoComplete="username" 
+            <input
+              className=" focus:transform focus:transition-all focus:scale-110 focus:outline-slate-700 text-sm font-mynerve shadow-xl rounded-md bg-inherit outline outline-1 outline-slate-400 p-3 "
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              name="name"
+              id="name"
+              placeholder="Username"
+              autoComplete="username"
             />
             {/* <label htmlFor="email">Email</label> */}
-            <input 
-              className="
-                focus:transform 
-                focus:transition-all 
-                focus:scale-110  
-                focus:outline-slate-700 
-                text-sm 
-                shadow-xl 
-                font-mynerve
-                rounded-md 
-                bg-inherit 
-                outline 
-                outline-1  
-                outline-slate-400
-                p-3
-              " 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              type="email" 
-              placeholder="Email" 
-              id="email" 
-              name="email" 
-              autoComplete="email" 
+            <input
+              className=" focus:transform focus:transition-all focus:scale-110 focus:outline-slate-700 text-sm shadow-xl font-mynerve rounded-md bg-inherit outline outline-1 outline-slate-400 p-3 "
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              placeholder="Email"
+              id="email"
+              name="email"
+              autoComplete="email"
             />
             {/* <label htmlFor="password">Password</label> */}
-            <input 
-              className="
-                focus:transform 
-                focus:transition-all 
-                focus:scale-110 
-                focus:outline-slate-700 
-                text-sm 
-                shadow-xl 
-                font-mynerve
-                rounded-md 
-                bg-inherit 
-                outline 
-                outline-1 
-                outline-slate-400
-                p-3 
-              " 
-              value={pass} 
-              onChange={(e) => setPass(e.target.value)} 
-              type="password" 
-              placeholder="Password" 
-              id="password" 
-              name="password" 
-              autoComplete="password" 
+            <input
+              className=" focus:transform focus:transition-all focus:scale-110 focus:outline-slate-700 text-sm shadow-xl font-mynerve rounded-md bg-inherit outline outline-1 outline-slate-400 p-3 "
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
+              type="password"
+              placeholder="Password"
+              id="password"
+              name="password"
+              autoComplete="password"
             />
-             {error && <p className="text-red-500 text-sm font-semibold p-4 m-auto">{error}</p>}
+            {error && <p className="text-red-500 text-sm font-semibold p-4 m-auto">{error}</p>}
             <motion.button
               className="p-4 rounded-3xl bg-blue-600 bg-opacity-95 mt-4 text-white text-xl font-mynerve shadow-xl"
               initial={{ opacity: 0.6 }}
@@ -118,53 +84,33 @@ const Register = ({ setView, setIsLoggedIn }) => {
               }}
               whileTap={{ scale: 0.9 }}
               whileInView={{ opacity: 1 }}>
-                Register
+              Register
             </motion.button>
           </form>
-          <div className="text-center mt-4">
-            <div className="flex items-center">
-              <div className="flex-grow border-b border-gray-400"></div>
-              <div className="mx-4 font-mynerve text-gray-500">OR</div>
-              <div className="flex-grow border-b border-gray-400"></div>
+            <div className="text-center mt-4">
+              <div className="flex items-center">
+                <div className="flex-grow border-b border-gray-400"></div>
+                <div className="mx-4 font-mynerve text-gray-500">OR</div>
+                <div className="flex-grow border-b border-gray-400"></div>
+              </div>
+              <GitHubButton/>
             </div>
-            <div 
-              className="
-                hover:transform 
-                hover:transition-all 
-                hover:scale-110 
-                cursor-pointer 
-                flex 
-                items-center 
-                justify-center 
-                gap-2 border 
-                border-1 
-                border-slate-400 
-                rounded-3xl 
-                font-mynerve
-                text-xl
-                mt-4 
-                p-3 
-                shadow-xl
-              "
-            >
-              <FaGithub size={30}/>
-              <span>Continue with GitHub</span>
-            </div>
-          </div>
         </motion.div>
-        <motion.button 
-          className="text-slate-800 bg-inherit font-mynerve text-xl mt-8" 
-          initial={{ opacity: 0.6 }}
-          whileHover={{
-            scale: 1.2,
-            transition: { duration: 0.1 },
-          }}
-          whileTap={{ scale: 0.9 }}
-          whileInView={{ opacity: 1 }}
-          onClick={() => setView('login')}
-        >
-          Already have an account? Login here.
-        </motion.button>
+        <Link to='/login'>
+          <motion.button
+            className="text-slate-800 bg-inherit font-mynerve text-xl mt-8"
+            initial={{ opacity: 0.6 }}
+            whileHover={{
+              scale: 1.2,
+              transition: { duration: 0.1 },
+            }}
+            whileTap={{ scale: 0.9 }}
+            whileInView={{ opacity: 1 }}
+          // onClick={() => setView('login')}
+          >
+            Already have an account? Login here.
+          </motion.button>
+        </Link>
       </div>
     </div>
   )

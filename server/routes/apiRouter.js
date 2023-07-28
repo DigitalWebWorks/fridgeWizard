@@ -11,7 +11,6 @@ router.get('/check-session', sessionController.isLoggedIn, (req, res) => {
 router.post('/logout', (req, res) => {
   console.log('---->router logout - req.cookie: ', req.cookies)
   res.clearCookie('token', { httpOnly: true });
-  res.clearCookie('email');
   res.status(200).json({ loggedOut: true });
 })
 
@@ -24,7 +23,7 @@ router.get('/oauth', sessionController.githubAuth, (req, res) => {
 
 router.get('/oauth/user', sessionController.getGithubToken, (req, res) => {
   console.log('/OAUTH/USER ')
-  res.status(200).redirect('http://localhost:8080/');
+  res.status(200).redirect('http://localhost:8080/dashboard');
 
 })
 

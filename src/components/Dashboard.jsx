@@ -1,36 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Contents } from './Contents';
 import { getFood } from '../fetchers/itemFetcher';
-import Header from './Header';
+// import Header from './Header';
 import InputFields from './InputFields';
 import LoadingSpinner from './LoadingSpinner'
 import CompositionGraph from './CompositionGraph'
 import IconButtons from './IconButtons';
 import ExpiringSoon from './ExpiringSoon'
 import Expired from './Expired'
+import HeaderForDashboard from './HeaderForDashboard';
 
-export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
+
+//import types object from json object in db
+
+export const Dashboard = () => {
   const [fridgeContents, setFridgeContents] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
   const [ESClicked, setESClicked] = useState(false)
   const [EClicked, setEClicked] = useState(false)
   const [graphClicked, setgraphClicked] = useState(false)
-  const email = localStorage.getItem('email');
+  const user = localStorage.getItem('email') || localStorage.getItem('user');
 
   useEffect(() => {
     const getFoodContent = async () => {
-      const res = await getFood(email)
+      const res = await getFood(user)
       setFridgeContents(res);
       setIsLoading(false);
     }
     getFoodContent();
-  }, [])
+  }, [user])
+
 
   return (
     <div className='flex flex-col'>
-      <div className='pb-20'>
-        <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-      </div>
+      <HeaderForDashboard />
       <div className='flex items-center justify-center'>
         <div className="w-3/5 md:w-1/2 flex flex-col">
           <div className='flex items-center justify-between'>
@@ -51,17 +54,14 @@ export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
             {EClicked && <Expired fridgeContents={fridgeContents} />}
           </div>
           <div className='flex flex-col'>
-            <InputFields email={email} setFridgeContents={setFridgeContents} />
-            {/* { graphClicked ? <CompositionGraph fridgeContents={fridgeContents}/>
-                   : isLoading ? <LoadingSpinner /> : <Contents email={email} isLoading={isLoading} setFridgeContents={setFridgeContents} fridgeContents={fridgeContents}/>
-                  } */}
-              {graphClicked &&
+            <InputFields email={user} setFridgeContents={setFridgeContents} />
+            {graphClicked &&
               <>
                 <CompositionGraph fridgeContents={fridgeContents} />
               </>
-              }
-              {isLoading && <LoadingSpinner />}
-            <Contents email={email} isLoading={isLoading} setFridgeContents={setFridgeContents} fridgeContents={fridgeContents} />
+            }
+            {isLoading && <LoadingSpinner />}
+            <Contents email={user} isLoading={isLoading} setFridgeContents={setFridgeContents} fridgeContents={fridgeContents} />
           </div>
         </div>
       </div>

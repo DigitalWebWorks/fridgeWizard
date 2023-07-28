@@ -44,11 +44,12 @@ userController.createUser = async (req, res, next) => {
     // execute createUserQuery, assign to newUser constant
     const newUser = await db.query(createUserQuery, values);
     // assign res.locals.newUser to newUser
+    res.locals.status = true;
     res.locals.newUser = newUser;
     // return invocation of next
     return next();
 
-  // catch - if error experienced during database queries
+    // catch - if error experienced during database queries
   } catch (err) {
     // log err
     console.log(err);
@@ -90,7 +91,7 @@ userController.verifyUser = async (req, res, next) => {
 
     // define a constant match, assign to evaluated result of invoking bcypt compare between entered password and database password
     const match = await bcrypt.compare(password, user.rows[0].password);
-    
+
     // if match is false
     if (!match) {
       // passwords do not match - set res.locals.status to appropriate error message
@@ -104,7 +105,7 @@ userController.verifyUser = async (req, res, next) => {
     // return invocation of next
     return next();
 
-  // catch - if error experienced during database queries
+    // catch - if error experienced during database queries
   } catch (err) {
     // log err
     console.log(err);
