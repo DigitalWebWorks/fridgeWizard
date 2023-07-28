@@ -1,176 +1,147 @@
-const UserData = require("../models/userModel");
+// require in userModelSQL
+const db = require('../models/userModel');
 
+// define inventoryController object
 const inventoryController = {};
 
-/*
-Controllers are JavaScript files that contain a set of methods, called actions, reached by the client according to the requested route. Whenever a client requests the route, the action performs the business logic code and sends back the response.
-*/
+// define query getIdQuery to grab user id; search using email
+const getIdQuery = `SELECT id FROM users WHERE email = ($1)`;
+// define query getFridgeQuery to grab wholistic fridge_contents data for a user
+const getFridgeQuery = `SELECT * FROM fridge_contents WHERE user_id = ($1)`;
 
-// @description Get items
-// @route GET /api/items
+// @description Get types data for dropdown menu
+// @route GET /api/inventory/types
+// @access Public
+inventoryController.getTypes = async (req, res, next) => {
+  try {
+    // define getTypesQuery to grab wholistic shelf_life data
+    const getTypesQuery = 'SELECT * FROM shelf_life';
+    // execute getTypesQuery, assign response to constant shelfLifeData
+    const shelfLifeData = await db.query(getTypesQuery);
+    // assign res.locals.shelfLifeData to shelfLifeData
+    res.locals.shelfLifeData = shelfLifeData;
+    // return invocation of next
+    return next();
+
+  // catch - if error experienced during database queries
+  } catch (error) {
+    // log error
+    console.log(error);
+    // return invocation of next, passing in error
+    return next(error);
+  }
+}
+
+// @description Get fridge items for a user
+// @route GET /api/inventory/:email
 // @access Public
 inventoryController.getItem = async (req, res, next) => {
-  // user enters purchaseDate, type, expDate, itemName
+  // deconstruct request parameters
+  const { email } = req.params;
+
   try {
-    // what are we using to identify a user? email, db _id?
-    const { email } = req.params;
-
-    // get items from db
-    const user = await UserData.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    // get user from database, then access fridgeContents
-    res.locals.getItem = user.fridgeContents;
+    // execute getIdQuery, assign response to constant user
+    const user = await db.query(getIdQuery, [email]);
+    // declare a constant id, assign it the row id value from user
+    const id = user.rows[0].id;
+    // execute getFridgeQuery, assign response to constant fridgeContents
+    const fridgeContents = await db.query(getFridgeQuery, [id]);
+    // assign res.locals.fridgeContents to fridgeContents
+    res.locals.fridgeContents = fridgeContents;
+    // return invocation of next
     return next();
+
+  // catch - if error experienced during database queries
   } catch (error) {
-    console.error(error);
+    // log error
+    console.log(error);
+    // return invocation of next, passing in error
     return next(error);
   }
 };
 
-// @description Set items
-// @route POST /api/items
-// @access Private
+// @description Add new fridge item for a user
+// @route POST /api/inventory
+// @access Public
 inventoryController.setItem = async (req, res, next) => {
+  // deconstruct request body
+  const { email, name, type, purchaseDate } = req.body;
+
   try {
-    const { email, name, type, expDate, category } = req.body;
+    // define query shelfLifeQuery to grab all shelf_life data associated with type
+    const shelflifeQuery = `SELECT * FROM shelf_life WHERE type = ($1)`;
+    // execute shelfLifeQuery, assign response to constant shelfLifeData
+    const shelfLifeData = await db.query(shelflifeQuery, [type]);
+    // declare constant category, assign to category value from shelfLifeData
+    const category = shelfLifeData.rows[0].category;
 
-    // Generate a unique ID for the new fridge contents
-    // const newItemId = mongoose.Types.ObjectId().toHexString();
-
-    // get user from database
-    // add new fridge contents to users fridgeContents array
-    const user = await UserData.findOneAndUpdate(
-      { email },
-      {
-        $push: {
-          fridgeContents: {
-            // _id: newItemId,
-            name,
-            type,
-            category,
-            expDate,
-          },
-        },
-      },
-      { new: true }
-    );
-
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
-    }
-
-    res.locals.newItem = user.fridgeContents;
+    // convert expDate to desired date format
+    const expDate = new Date(purchaseDate);
+    const days = expDate.getDate() + shelfLifeData.rows[0].exp_days;
+    expDate.setDate(days);
+    expDate.toDateString();
+    
+    // execute getIdQuery, assign response to constant user
+    const user = await db.query(getIdQuery, [email]);
+    // declare a constant id, assign it the row id value from user
+    const id = user.rows[0].id;
+    // declare values array for setItemQuery query
+    const values = [id, name, type, category, expDate];
+    /// define query setItemQuery to insert new row into fridge_contents; return new data
+    const setItemQuery = 'INSERT INTO fridge_contents (user_id, name, type, category, exp_date) VALUES ($1, $2, $3, $4, $5)';
+    // execute setItemQuery to add item into database
+    await db.query(setItemQuery, values);
+    // execute getFridgeQuery, assign response to constant fridgeContents
+    const fridgeContents = await db.query(getFridgeQuery, [id]);
+    // assign res.locals.fridgeContents to fridgeContents
+    res.locals.fridgeContents = fridgeContents;
+    // return invocation of next
     return next();
+
+  // catch - if error experienced during database queries
   } catch (error) {
-    console.error(error);
+    // log error
+    console.log(error);
+    // return invocation of next, passing in err
     return next(error);
   }
 };
 
-// @description Update items
-// @route PUT /api/items/:id
-// @access Private
-inventoryController.updateItem = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { email, item, type, category, expDate } = req.body;
-
-    // find user in database
-    const user = await UserData.findOne({ email });
-
-    // if no user in database
-    if (!user) {
-      return res.status(400).json({ message: "No user found" });
-    }
-
-    // if each fridgeContents object has a unique id
-    const itemIndex = user.fridgeContents.findIndex((food) => {
-      return food._id === id;
-    });
-
-    // if item not found in fridge
-    if (itemIndex === -1) {
-      return res.status(404).json({ message: "Fridge content not found" });
-    }
-
-    // if item is found update it
-    user.fridgeContents[itemIndex] = {
-      item,
-      type,
-      category,
-      expDate,
-    };
-
-    // save updated document
-    await user.save();
-
-    // idea from Robert:
-    // get user then copy contetns into obj
-    // try findOneandUpdate
-    // then change it and re save to database
-    // lookup way to go inside a propery in model
-
-    res.locals.updatedItem = user.fridgeContents;
-    return next();
-  } catch (error) {
-    console.error(error);
-    return next(error);
-  }
-};
-
-// @description Delete item
-// @route DELETE /api/items/:id
-// @access Private
+// @description Delete fridge items for a user
+// @route DELETE /api/inventory
+// @access Public
 inventoryController.deleteItem = async (req, res, next) => {
+  // deconstruct request body
+  const { email, selectedRows } = req.body;
+
   try {
-    // const { id } = req.params;
-    const { email, fridgeContents } = req.body;
+    // define query deleteQuery to delete item from fridge_contents
+    const deleteQuery = `DELETE FROM fridge_contents WHERE id = $1`
+    // loop through selectedRows array 
+    for (let i = 0; i < selectedRows.length; i++){
+      // execute selectedRows with value of current selectedRows elements id
+      await db.query(deleteQuery, [selectedRows[i].id]);
+    }
 
-    const newFridgeContents = fridgeContents;
-
-    // find user in database
-    const user = await UserData.findOneAndUpdate({ email }, 
-    {
-     fridgeContents: newFridgeContents
-    }, 
-    {
-      upsert: true,
-      new: true
-    });
-
-    // if (!user) {
-    //   return res.status(400).json({ message: "User not found" });
-    // }
-
-    // // find the index of the fridge item I want to delete
-    // const itemIndex = user.fridgeContents.findIndex((food) => {
-    //   return food._id === id;
-    // });
-
-    // // ******** some mongoose methods will return the deleted document
-    // // deleteOne and DeleteMany do not return the deleted document
-
-    // // if food content not found
-    // if (itemIndex === -1) {
-    //   return res.status(404).json({ message: "Fridge content not found" });
-    // }
-
-    // // delete food from fridge
-    // user.fridgeContents.splice(itemIndex, 1);
-
-    // // save the updated user document
-    // await user.save();
-
-    // do we need to use res.locals? what are sending back?
+    // execute getIdQuery, assign response to constant user
+    const user = await db.query(getIdQuery, [email]);
+    // declare a constant id, assign it the row id value from user
+    const id = user.rows[0].id;
+    // execute getFridgeQuery, assign response to constant fridgeContents
+    const fridgeContents = await db.query(getFridgeQuery, [id]);
+    // assign res.locals.fridgeContents to fridgeContents
+    res.locals.fridgeContents = fridgeContents;
+    // return invocation of next
     return next();
+
+  // catch - if error experienced during database queries
   } catch (error) {
-    console.error(error);
+    // log error
+    console.log(error);
+    // return invocation of next, passing in err
     return next(error);
   }
 };
 
+// export inventoryController
 module.exports = inventoryController;

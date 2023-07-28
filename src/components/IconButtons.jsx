@@ -3,7 +3,7 @@ import { BiAlarm } from 'react-icons/bi'
 import {PiGraph } from 'react-icons/pi'
 import {TbBiohazard} from 'react-icons/tb'
 
-function IconButtons({ ESClicked, setESClicked, EClicked, setEClicked, graphClicked, setgraphClicked, fridgeContents }) {
+function IconButtons({ ESClicked, setESClicked, EClicked, setEClicked, graphClicked, setgraphClicked }) {
   const expiringSoonButton = () => {
     setESClicked(!ESClicked);
   }

@@ -1,71 +1,48 @@
 import React, { useState, useEffect } from 'react'
 import { useForm } from "react-hook-form";
-import { postFood } from '../fetchers/itemFetcher';
+import { postFood, getTypes } from '../fetchers/itemFetcher';
 import moment from 'moment';
 
 function InputFields({ setFridgeContents, email }) {
-    const shelfLife = require('../../server/shelflife.json')
-    const [expDate2, setExpDate2] = useState(moment().format('YYYY-MM-DD'))
     const [purchaseDate, setPurchaseDate] = useState(moment().format('YYYY-MM-DD'))
-    const [daysToSpoil, setDaysToSpoil] = useState(0)
-    const [category, setCategory] = useState('')
+    // const [category, setCategory] = useState('')
     const [error, setError] = useState('')
     const { register, formState: { errors }, handleSubmit, reset } = useForm();
+    const [typesArray, setTypesArray] = useState([]);
 
-    const typesArray = []
-          shelfLife.forEach(element => { typesArray.push(element.item);
-        });
-    const categoryArray = []
-          shelfLife.forEach(element => {categoryArray.push(element.category)})
-    
-        const onSubmit = async ({type, itemName}) => { 
-            if (type === 'Select an option') {
-                setError('Not a valid selection')
-                setTimeout(() => {
-                  setError('')
-                }, 1500)
-                return; 
-            }
-            // console.log(category);
-            const res = await postFood({ type, name: itemName, expDate2, email, category });
-            setError('');
-            setFridgeContents(res);
-            setPurchaseDate(moment().format('YYYY-MM-DD'))
-            reset();
-        };
-    
-    useEffect(()=>{
-        const expirationDateUpdater = () => {
-            setExpDate2(moment(purchaseDate).add(daysToSpoil, 'd').format('YYYY-MM-DD'));
-            return
+    useEffect(async ()=> {
+      const res = await getTypes();
+      let temp = res.map((e) => {
+        return e.type;
+      })
+      temp.sort();
+      setTypesArray(temp);
+    }, []);
+
+    const onSubmit = async ({type, itemName}) => { 
+        if (type === 'Select an option') {
+            setError('Not a valid selection')
+            setTimeout(() => {
+              setError('')
+            }, 1500)
+            return; 
         }
-        expirationDateUpdater();
-    },[purchaseDate, daysToSpoil])
+        const res = await postFood({ type, name: itemName, purchaseDate, email  });
+        setError('');
+        setFridgeContents(res);
+        setPurchaseDate(moment().format('YYYY-MM-DD'))
+        reset();
+    };
     
     const purchaseDateHandler = (e) => {
-        // e.preventDefault();
         setPurchaseDate(moment(e).format('YYYY-MM-DD'))
-    }
-    const daysToSpoilHandler = (e) => {
-        // e.preventDefault();
-        //figure out how to find passed in type "(e)" in shelfLife object
-        shelfLife.forEach((el, index) => {
-            if(el.item === e){
-              categoryArray.forEach((el, idx) =>{ 
-                if(index === idx && el != undefined){
-                        // console.log(el)
-                        setCategory(el);
-                    }})
-              setDaysToSpoil(el.shelflife)}
-        })
     }
 
   return (
     <div className='flex flex-col mb-14'>
       <form className='' onSubmit={handleSubmit(onSubmit)}>
         <div className='flex items-center justify-between gap-2 pt-4'>
-          {/* <label className='inputLabels'id='itemName'>Name:</label> */}
-          {/* <label className='inputLabels' htmlFor='type'>Type:</label> */}
+
           <div className='flex flex-col items-center'>
             <div className='flex flex-col items-start'>
               <span className='font-mynerve'>Type</span>
@@ -88,7 +65,7 @@ function InputFields({ setFridgeContents, email }) {
                   cursor-pointer
                 ' 
                 id='type' 
-                onInput={(e) => daysToSpoilHandler(e.target.value)} placeholder='Type:' 
+                placeholder='Type:' 
                 {...register("type")}
               >
                 <option>
@@ -123,7 +100,6 @@ function InputFields({ setFridgeContents, email }) {
               placeholder='Name' {...register("itemName")}
             /> 
           </div>
-          {/* <label className='inputLabels'htmlFor='purchaseDate'>Purchase date:</label> */}
           <div className='flex flex-col justify-center'>
             <span className='font-mynerve'>Purchase Date</span>
             <input 
@@ -151,21 +127,11 @@ function InputFields({ setFridgeContents, email }) {
               {...register("purchaseDate")}
             />
           </div>
-          <input
+          {/* <input
             type='hidden'
             value={category}
             {...register("category")}
-          />
-          {/* <label className='inputLabels' id='expDate'>Expiration date:</label>
-          <input className='inputField' id='expDate' type='date' placeholder='expDate' value={expDate2}  {...register("expDate")}/> */}
-          {/* <label htmlFor="purchaseDate">Date Purchased:</label> */}
-          {/* <input className="input" value={purchaseDate} type='date' placeholder="Date Purchased" id="purchaseDate" name="purchaseDate"/> */}
-          {/* <label htmlFor='type'>Type:</label> */}
-          {/* <input className='input' type='dropdown' name='type' id='type' placeholder='Enter Type'/> */}
-          {/* <label htmlFor='expDate'>Expiration date:</label> */}
-          {/* <input className='input' type='date' placeholder="Expiration Date" id="expDate" name="expDate"/> */}
-          {/* <label htmlFor='itemName'>Name:</label> */}
-          {/* <input className='input' type='text' placeholder='Item Name' id='itemName'name='itemName'/> */}
+          /> */}
           
           <button 
             className="
@@ -187,7 +153,6 @@ function InputFields({ setFridgeContents, email }) {
           >
             Add item
           </ button>
-          
         </div>
       </form>
     </div>

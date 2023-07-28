@@ -22,7 +22,6 @@ ChartJS.register(
 );
 
 function CompositionGraph({ fridgeContents }) {
-  const shelfLife = require("../../server/shelflife.json");
   const data = {
     labels: ["Dairy", "Meat", "Produce", "Condiments", "Drinks"],
     datasets: [
@@ -45,19 +44,13 @@ function CompositionGraph({ fridgeContents }) {
   };
 
   fridgeContents.forEach((el) => {
-    shelfLife.forEach(element => {
-      if (el.type === element.item) data.datasets[0].data[catagoryDataIndicies[element.category]]++;
-    })
+      data.datasets[0].data[catagoryDataIndicies[el.category]]++;
   });
 
   return (
-
     <div className="flex flex-col justify-center max-h-[650px] bg-white m-50">
-
       <Radar data={data} />
-
     </div>
-
   )
 }
 
