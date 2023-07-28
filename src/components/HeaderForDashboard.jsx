@@ -18,11 +18,13 @@ export default function HeaderForDashboard() {
     const handleLogout = async () => {
         try {
             const res = await logoutUser();
+
             if (res) {
-                navigate('/');
                 auth.setIsLoggedIn(false);
                 localStorage.removeItem('email');
                 localStorage.removeItem('user');
+                // navigate('/');
+                window.location = '/'
             }
         } catch (err) {
             console.log(err);
