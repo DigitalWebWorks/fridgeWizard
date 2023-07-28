@@ -11,7 +11,6 @@ router.get('/check-session', sessionController.isLoggedIn, (req, res) => {
 router.post('/logout', (req, res) => {
   console.log('---->router logout - req.cookie: ', req.cookies)
   res.clearCookie('token', { httpOnly: true });
-  res.clearCookie('email');
   res.status(200).json({ loggedOut: true });
 })
 

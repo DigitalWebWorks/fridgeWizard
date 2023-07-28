@@ -6,14 +6,13 @@ import { Dashboard } from "./Dashboard";
 import Login from './Login'
 import Register from "./Register";
 import { checkSession } from "../fetchers/userFetcher";
-
-import axios from 'axios';
 import Cookies from 'universal-cookie';
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [view, setView] = useState('homepage');
+  const navigate = useNavigate();
 
 
   // checks whether user has an active session or not on component loading
@@ -25,19 +24,21 @@ function App() {
         const res = await checkSession();
         console.log('checkUserSession response: ', res)
 
-        if (localStorage.getItem('email') === null) {
-          const cookies = new Cookies();
-          const emailToken = cookies.get('email');
-          const jwtToken = cookies.get('token');
-          console.log('emailToken: ', emailToken)
-          console.log('jwtToken: ', jwtToken)
-
-          if (emailToken) localStorage.setItem('email', emailToken)
-        }
-
-        if (res) {
+        if (res.userName) {
+          if (localStorage.getItem('user') === null || localStorage.getItem('user') === undefined) {
+            const cookies = new Cookies();
+            const user = cookies.get('user');
+            localStorage.setItem('user', user)
+            setTimeout(() => {
+              cookies.remove('user', { path: '/' });
+            }, 1000)
+          }
           setIsLoggedIn(true);
           setIsLoading(false);
+        } else if (res.email) {
+          setIsLoggedIn(true);
+          setIsLoading(false);
+          navigate("/dashboard");
         }
       } catch (err) {
         console.log(err);
@@ -47,27 +48,25 @@ function App() {
     };
 
     checkUserSession();
-  });
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
+  console.log('isLoggedIn: ', isLoggedIn)
   return (
     <>
-      <AuthContext.Provider value={{ setIsLoggedIn, isLoggedIn, view, setView }}>
+      <AuthContext.Provider value={{ setIsLoggedIn, isLoggedIn }}>
         <Routes>
-          <Route path='/' element={<Homepage />} />
-          {isLoggedIn ? (
-            <>
-              <Route path='/dashboard' element={<Dashboard />} />
-            </>
-          ) : (
-            <>
-              <Route path='/login' element={<Login />} />
-              <Route path='/register' element={<Register />} />
-            </>
-          )}
+          {/* {isLoggedIn ? ( */}
+          <Route path='/dashboard' element={<Dashboard />} />
+          {/* ) : ( */}
+          <>
+            <Route path='/' element={<Homepage />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+          </>
+          {/* )} */}
         </Routes>
       </AuthContext.Provider>
     </>

@@ -25,11 +25,13 @@ const Register = () => {
     }
 
     const res = await registerUser(email, pass, name);
-    const newUser = res;
-
-    if (newUser) {
-      auth.setIsLoggedIn(true);
-      navigate('/dashboard')
+  
+    if (res.status === true) {
+      localStorage.setItem('email', email);
+      auth.setIsLoggedIn(res.status);
+      navigate("/dashboard");
+    } else {
+      setError(res.status);
     }
   };
 

@@ -28,7 +28,6 @@ const Login = () => {
     if (res.status === true) {
       localStorage.setItem('email', email);
       auth.setIsLoggedIn(res.status);
-      auth.setView('dashboard');
       navigate("/dashboard");
     } else {
       setError(res.status);
@@ -104,7 +103,6 @@ const Login = () => {
             }}
             whileTap={{ scale: 0.9 }}
             whileInView={{ opacity: 1 }}
-          // onClick={() => setView('register')}
           >
             New to Fridge Wizard? Join now
           </motion.button>

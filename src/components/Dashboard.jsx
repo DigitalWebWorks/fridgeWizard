@@ -13,24 +13,24 @@ import HeaderForDashboard from './HeaderForDashboard';
 
 //import types object from json object in db
 
-export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
+export const Dashboard = () => {
   const [fridgeContents, setFridgeContents] = useState([]);
   const [isLoading, setIsLoading] = useState(true)
   const [ESClicked, setESClicked] = useState(false)
   const [EClicked, setEClicked] = useState(false)
   const [graphClicked, setgraphClicked] = useState(false)
-  const email = localStorage.getItem('email');
+  const user = localStorage.getItem('email') || localStorage.getItem('user');
 
   useEffect(() => {
     const getFoodContent = async () => {
-      const res = await getFood(email)
+      const res = await getFood(user)
       setFridgeContents(res);
       setIsLoading(false);
     }
     getFoodContent();
-  }, [])
+  }, [user])
 
- 
+
   return (
     <div className='flex flex-col'>
       <HeaderForDashboard />
@@ -55,14 +55,14 @@ export const Dashboard = ({ isLoggedIn, setIsLoggedIn }) => {
             {EClicked && <Expired fridgeContents={fridgeContents} />}
           </div>
           <div className='flex flex-col'>
-            <InputFields email={email} setFridgeContents={setFridgeContents} />
+            <InputFields email={user} setFridgeContents={setFridgeContents} />
             {graphClicked &&
               <>
                 <CompositionGraph fridgeContents={fridgeContents} />
               </>
             }
             {isLoading && <LoadingSpinner />}
-            <Contents email={email} isLoading={isLoading} setFridgeContents={setFridgeContents} fridgeContents={fridgeContents} />
+            <Contents email={user} isLoading={isLoading} setFridgeContents={setFridgeContents} fridgeContents={fridgeContents} />
           </div>
         </div>
       </div>

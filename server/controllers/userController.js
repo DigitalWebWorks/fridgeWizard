@@ -9,42 +9,42 @@ const UserData = require('../models/userModel')
 // @access Public
 const userController = {};
 
-userController.createUser =  async (req, res, next) => {
+userController.createUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
-  
+
     // check for all user inputs
     if (!name || !email || !password) {
       res.status(400);
       throw new Error("Please add all fields");
     }
-  
+
     // check if user exists
     const userExists = await UserData.findOne({ email });
     console.log(userExists);
-  
+
     if (userExists) {
       return next('User already exists')
     }
-  
+
     const newUser = await UserData.create({ username: name, password, email })
 
-  
+    res.locals.status = true;
     res.locals.newUser = newUser;
-  
+
     return next();
   } catch (err) {
     console.log(err)
     return next(err);
   }
- 
+
 };
 
 // @description Authenticate user data
 // @route POST /api/users/login
 // @access Public
 userController.verifyUser = async (req, res, next) => {
-  try{
+  try {
     const { email, password } = req.body;
     res.locals.status = true;
 
@@ -56,7 +56,7 @@ userController.verifyUser = async (req, res, next) => {
     }
 
     const correctPass = await UserData.comparePassword(password, user.password);
-    
+
     if (!correctPass) {
       res.locals.status = 'Incorrect username or password';
       return next();
@@ -71,22 +71,22 @@ userController.verifyUser = async (req, res, next) => {
 
   // check for email and password
 
-//   // find user by email in db
-//   const user = await User.findOne({ email });
+  //   // find user by email in db
+  //   const user = await User.findOne({ email });
 
-// //   // check if user exists and password is correct
-//   if (user && (await bcrypt.compare(password, user.password))) {
-//     res.json({
-//       _id: user.id,
-//       name: user.name,
-//       email: user.email,
-//       token: generateToken(user._id),
-//     });
-//     return next()
-//   } else {
-//     res.status(400);
-//     throw new Error("Invalid Credentials");
-//   }
+  // //   // check if user exists and password is correct
+  //   if (user && (await bcrypt.compare(password, user.password))) {
+  //     res.json({
+  //       _id: user.id,
+  //       name: user.name,
+  //       email: user.email,
+  //       token: generateToken(user._id),
+  //     });
+  //     return next()
+  //   } else {
+  //     res.status(400);
+  //     throw new Error("Invalid Credentials");
+  //   }
 };
 
 
@@ -94,7 +94,7 @@ userController.verifyUser = async (req, res, next) => {
 // @route GET /api/users/home
 // @access Private
 userController.goHome = async (req, res) => {
-//   res.redirect('/home')
+  //   res.redirect('/home')
 };
 
 // Generate token

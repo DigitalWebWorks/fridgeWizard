@@ -38,18 +38,20 @@ sessionController.getGithubToken = async (req, res, next) => {
       },
     });
 
-    const userEmail = user.data.email
+    // const userEmail = user.data.email || user.data.login
 
-    const token = jwt.sign({ userEmail }, process.env.JWT_SECRET, {
+    const userName = user.data.email || user.data.login;
+
+    const token = jwt.sign({ userName }, process.env.JWT_SECRET, {
       expiresIn: '1h',
     })
 
     res.cookie('token', token, { httpOnly: true, secure: true });
-    // res.cookie('email', user.data.email, { httpOnly: true, secure: true });
-    res.cookie('email', user.data.email);
+    res.cookie('user', userName);
 
-    res.locals.email = user.data.email;
-    res.locals.status = true;
+    // res.locals.email = user.data.email;
+    // res.locals.status = true;
+    // res.locals.user = userEmail;
 
     return next();
   }
@@ -106,15 +108,16 @@ sessionController.isLoggedIn = async (req, res, next) => {
   }
 };
 
-sessionController.logout = async (req, res, next) => {
-  console.log('---->sessionController.logout - req.cookie: ', req.cookies)
-  try {
-    res.clearCookie('token', { httpOnly: true, secure: true });
-    res.clearCookie('githubToken', { httpOnly: true, secure: true });
-    return next();
-  } catch (err) {
-    return next(err);
-  }
-};
+// sessionController.logout = async (req, res, next) => {
+//   console.log('---->sessionController.logout - req.cookie: ', req.cookies)
+//   try {
+//     res.clearCookie('token', { httpOnly: true, secure: true });
+//     res.clearCookie('user', { httpOnly: true, secure: true });
+//     res.clearCookie('email', { httpOnly: true, secure: true });
+//     return next();
+//   } catch (err) {
+//     return next(err);
+//   }
+// };
 
 module.exports = sessionController;
