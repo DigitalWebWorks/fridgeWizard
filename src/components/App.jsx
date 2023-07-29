@@ -1,36 +1,44 @@
 import React, { useState, useEffect } from "react";
-
+import { Routes, Route } from "react-router-dom";
+import { AuthContext } from "./authContext";
 import Homepage from "./Homepage";
 import { Dashboard } from "./Dashboard";
+import Login from './Login'
+import Register from "./Register";
 import { checkSession } from "../fetchers/userFetcher";
+import Cookies from 'universal-cookie';
+import { useNavigate } from "react-router-dom";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [view, setView] = useState('homepage');
+  const navigate = useNavigate();
 
-  const handleCodeParams = () => {
-    const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-  
-        // Check if the code parameter exists
-        if (code) {
-          // Perform actions with the code parameter
-          // For example, make an API request to exchange the code for an access token
-          // or save the code to state for further processing
-          return true;
-        }
-        return false;
-  }
 
   // checks whether user has an active session or not on component loading
   useEffect(() => {
+
     const checkUserSession = async () => {
       try {
+
         const res = await checkSession();
-        if (res) {
+        console.log('checkUserSession response: ', res)
+
+        if (res.userName) {
+          if (localStorage.getItem('user') === null || localStorage.getItem('user') === undefined) {
+            const cookies = new Cookies();
+            const user = cookies.get('user');
+            localStorage.setItem('user', user)
+            setTimeout(() => {
+              cookies.remove('user', { path: '/' });
+            }, 1000)
+          }
           setIsLoggedIn(true);
           setIsLoading(false);
+        } else if (res.email) {
+          setIsLoggedIn(true);
+          setIsLoading(false);
+          navigate("/dashboard");
         }
       } catch (err) {
         console.log(err);
@@ -45,18 +53,23 @@ function App() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
+  console.log('isLoggedIn: ', isLoggedIn)
   return (
-    <div className="bg-gradient-to-b from-zinc-100 via-zinc-300 to-sky-300 min-h-screen">
-      <div className="pb-32">
-        { isLoggedIn 
-          ? 
-            <Dashboard isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} /> 
-          : 
-            <Homepage setIsLoggedIn={setIsLoggedIn} view={view} setView={setView} />
-        }
-      </div>
-    </div>
+    <>
+      <AuthContext.Provider value={{ setIsLoggedIn, isLoggedIn }}>
+        <Routes>
+          {/* {isLoggedIn ? ( */}
+          <Route path='/dashboard' element={<Dashboard />} />
+          {/* ) : ( */}
+          <>
+            <Route path='/' element={<Homepage />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+          </>
+          {/* )} */}
+        </Routes>
+      </AuthContext.Provider>
+    </>
   );
 }
 

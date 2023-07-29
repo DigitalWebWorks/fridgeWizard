@@ -10,6 +10,7 @@ export const loginUser = async (email, password) => {
 }
 
 export const registerUser = async (email, password, name) => {
+  console.log('entered registerUser');
   try {
     const res = await axios.post('/api/users/register', { email, password, name });
     return res.data;
@@ -36,3 +37,14 @@ export const logoutUser = async () => {
     return err;
   }
 }
+
+// export const oauth = async () => {
+//   console.log("----> oauth fetcher is running");
+//   try {
+//     const res = await axios.get('/api/oauth/user');
+//     console.log('-----> oauth userFetcher - res.data : ', res.data)
+//     return res.data;
+//   } catch (err) {
+//     console.log("oauth fetcher is not working");
+//   }
+// }
