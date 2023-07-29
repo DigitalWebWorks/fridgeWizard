@@ -22,9 +22,9 @@ export const getFood = async (email) => {
 }
 
 // define and export postFood function; add new fridge item for a user
-export const postFood = async ({ type, purchaseDate, name, email }) => {
+export const postFood = async ({ type, userDate, name, email, selectedDate}) => {
   try {
-    const res = await axios.post('/api/inventory', { type, purchaseDate, name, email });
+    const res = await axios.post('/api/inventory', { type, userDate, name, email, selectedDate});
     return res.data.rows;
   } catch (err) {
     console.log(err);

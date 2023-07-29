@@ -1,4 +1,5 @@
 // require in userModelSQL
+const { PresenceContext } = require('framer-motion');
 const db = require('../models/userModel');
 
 // define inventoryController object
@@ -65,7 +66,9 @@ inventoryController.getItem = async (req, res, next) => {
 // @access Public
 inventoryController.setItem = async (req, res, next) => {
   // deconstruct request body
-  const { email, name, type, purchaseDate } = req.body;
+  const { email, name, type, userDate, selectedDate } = req.body;
+  // define variable expDate
+  let expDate;
 
   try {
     // define query shelfLifeQuery to grab all shelf_life data associated with type
@@ -75,11 +78,18 @@ inventoryController.setItem = async (req, res, next) => {
     // declare constant category, assign to category value from shelfLifeData
     const category = shelfLifeData.rows[0].category;
 
-    // convert expDate to desired date format
-    const expDate = new Date(purchaseDate);
-    const days = expDate.getDate() + shelfLifeData.rows[0].exp_days;
-    expDate.setDate(days);
-    expDate.toDateString();
+    // if selectedDate is Purchase Date
+    if (selectedDate === 'Purchase Date'){
+      // convert expDate to desired date format
+      expDate = new Date(userDate);
+      const days = expDate.getDate() + shelfLifeData.rows[0].exp_days;
+      expDate.setDate(days);
+      expDate.toDateString();
+    // else (i.e. if selectedDate is Expiraiton Date)
+    } else {
+      // set expDate as userDate
+      expDate = userDate;
+    }
     
     // execute getIdQuery, assign response to constant user
     const user = await db.query(getIdQuery, [email]);
