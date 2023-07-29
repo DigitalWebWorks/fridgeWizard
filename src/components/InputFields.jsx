@@ -4,39 +4,39 @@ import { postFood, getTypes } from '../fetchers/itemFetcher';
 import moment from 'moment';
 
 function InputFields({ setFridgeContents, email }) {
-    const [purchaseDate, setPurchaseDate] = useState(moment().format('YYYY-MM-DD'))
-    // const [category, setCategory] = useState('')
-    const [error, setError] = useState('')
-    const { register, formState: { errors }, handleSubmit, reset } = useForm();
-    const [typesArray, setTypesArray] = useState([]);
+  const [userDate, setUserDate] = useState(moment().format('YYYY-MM-DD'));
+  const [error, setError] = useState('');
+  const { register, formState: { errors }, handleSubmit, reset } = useForm();
+  const [typesArray, setTypesArray] = useState([]);
 
-    useEffect(async ()=> {
-      const res = await getTypes();
-      let temp = res.map((e) => {
-        return e.type;
-      })
-      temp.sort();
-      setTypesArray(temp);
-    }, []);
+  useEffect(async ()=> {
+    const res = await getTypes();
+    let temp = res.map((e) => {
+      return e.type;
+    })
+    temp.sort();
+    setTypesArray(temp);
+  }, []);
 
-    const onSubmit = async ({type, itemName}) => { 
-        if (type === 'Select an option') {
-            setError('Not a valid selection')
-            setTimeout(() => {
-              setError('')
-            }, 1500)
-            return; 
-        }
-        const res = await postFood({ type, name: itemName, purchaseDate, email  });
-        setError('');
-        setFridgeContents(res);
-        setPurchaseDate(moment().format('YYYY-MM-DD'))
-        reset();
-    };
-    
-    const purchaseDateHandler = (e) => {
-        setPurchaseDate(moment(e).format('YYYY-MM-DD'))
+  const onSubmit = async ({type, itemName, selectedDate}) => { 
+    if (type === 'Select an option') {
+        setError('Not a valid selection')
+        setTimeout(() => {
+          setError('')
+        }, 1500)
+        return; 
     }
+    const res = await postFood({ type, name: itemName, userDate, email, selectedDate });
+    setError('');
+    setFridgeContents(res);
+    setUserDate(moment().format('YYYY-MM-DD'))
+    reset();
+  };
+
+  const userInputHandler = (e) => {
+    setUserDate(moment(e).format('YYYY-MM-DD'))
+    
+  }
 
   return (
     <div className='flex flex-col mb-14'>
@@ -101,38 +101,60 @@ function InputFields({ setFridgeContents, email }) {
             /> 
           </div>
           <div className='flex flex-col justify-center'>
-            <span className='font-mynerve'>Purchase Date</span>
+              <select 
+                  className='
+                    p-2 
+                    font-mynerve
+                    shadow-xl
+                    bg-white 
+                    bg-opacity-70 
+                    focus:outline-none 
+                    focus:border-blue-600 
+                    focus:border-2 
+                    hover:transform
+                    hover:transition-all
+                    hover:scale-110
+                    border 
+                    border-slate-700 
+                    rounded-md
+                    cursor-pointer
+                  ' 
+                  id='selectedDate' 
+                  placeholder='Date:' 
+                  {...register("selectedDate")}
+                >
+                  <option>
+                    Purchase Date
+                  </option>
+                  <option>
+                    Expiration Date
+                  </option>
+                </select>
             <input 
               className="
-                p-2 
-                m-0
-                font-mynerve 
-                shadow-xl
-                focus:border-blue-600
-                focus:outline-none 
-                focus:border-2
-                hover:transform
-                hover:transition-all
-                hover:scale-110
-                bg-white 
-                bg-opacity-70 
-                border 
-                border-slate-700
+              p-2 
+              m-0
+              font-mynerve 
+              shadow-xl
+              focus:border-blue-600
+              focus:outline-none 
+              focus:border-2
+              hover:transform
+              hover:transition-all
+              hover:scale-110
+              bg-white 
+              bg-opacity-70 
+              border 
+              border-slate-700
               "  
-              id='purchaseDate' 
+              id='userDate' 
               type='date' 
-              onInput={(e) => purchaseDateHandler(e.target.value)} 
-              defaultValue={purchaseDate} 
-              placeholder='purchaseDate' 
-              {...register("purchaseDate")}
-            />
+              onInput={(e) => userInputHandler(e.target.value)} 
+              defaultValue={userDate} 
+              placeholder='userDate' 
+              {...register("userDate")}
+              />
           </div>
-          {/* <input
-            type='hidden'
-            value={category}
-            {...register("category")}
-          /> */}
-          
           <button 
             className="
               font-mynerve 
